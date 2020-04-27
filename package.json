@@ -1,0 +1,14 @@
+{
+  "name": "expr",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/fran-d/expr.git",
+  "license": "MIT",
+  "resolutions": {
+    "is-promise": "2.1.0",
+    "run-async/is-promise": "2.1.0"
+  },
+  "devDependencies": {
+    "create-react-app": "^3.4.1"
+  }
+}
