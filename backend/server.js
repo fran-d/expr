@@ -4,14 +4,15 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const exprRoutes = express.Router();
-const PORT = 4000;
+const configParams = require('./config.json');
+const PORT = configParams.serverPort;
 
 let Expr = require('./expr.model');
 
 app.use(cors());
 app.use(bodyParser.json());
 
-mongoose.connect('mongodb://127.0.0.1:27017/expr', { useNewUrlParser: true });
+mongoose.connect(`mongodb://${configParams.mongoHost}:${configParams.mongoPort}/expr`, { useNewUrlParser: true });
 const connection = mongoose.connection;
 
 connection.once('open', function() {

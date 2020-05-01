@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import { properties } from './properties.js';
+
 
 export default class EditExpr extends Component {
 
@@ -21,7 +23,7 @@ export default class EditExpr extends Component {
     }
 
     componentDidMount() {
-        axios.get('http://localhost:4000/expr/'+this.props.match.params.id)
+        axios.get(`http://${properties.serverHost}:${properties.serverPort}/expr/${this.props.match.params.id}`)
             .then(response => {
                 this.setState({
                     expr_description: response.data.expr_description,
