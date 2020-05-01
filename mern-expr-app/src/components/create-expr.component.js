@@ -1,5 +1,11 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import { properties } from './properties.js';
+
+import DatePicker from "react-datepicker";
+ 
+import "react-datepicker/dist/react-datepicker.css";
+
 
 export default class CreateExpr extends Component {
     constructor(props) {
@@ -7,15 +13,24 @@ export default class CreateExpr extends Component {
 
         this.state = {
             expr_description: '',
-            expr_responsible: '',
+            expr_responsible: new Date(),
             expr_priority: '',
-            expr_completed: false
+            expr_completed: false,
+            startDate: new Date()
         }
         this.onChangeExprDescription = this.onChangeExprDescription.bind(this);
         this.onChangeExprResponsible = this.onChangeExprResponsible.bind(this);
         this.onChangeExprPriority = this.onChangeExprPriority.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
     }
+
+    handleChange = date => {
+        console.log(date);
+        this.setState({
+          startDate: date,
+          expr_responsible: date
+        });
+      };
 
     onChangeExprDescription(e) {
         this.setState({
@@ -45,12 +60,12 @@ export default class CreateExpr extends Component {
         
          const newExpr = {
             expr_description: this.state.expr_description,
-            expr_responsible: this.state.expr_responsible,
+            expr_responsible: this.state.startDate.toLocaleDateString(),
             expr_priority: this.state.expr_priority,
             expr_completed: this.state.expr_completed
         };
 
-        axios.post('http://localhost:4000/expr/add', newExpr)
+        axios.post(`http://${properties.serverHost}:${properties.serverPort}/expr/add`, newExpr)
             .then(res => console.log(res.data));
 
         this.setState({
@@ -66,7 +81,7 @@ export default class CreateExpr extends Component {
                 <h3>Create New Expr</h3>
                 <form onSubmit={this.onSubmit}>
                     <div className="form-group"> 
-                        <label>Description: </label>
+                        <label>Item Name: </label>
                         <input  type="text"
                                 className="form-control"
                                 value={this.state.expr_description}
@@ -74,50 +89,14 @@ export default class CreateExpr extends Component {
                                 />
                     </div>
                     <div className="form-group">
-                        <label>Responsible: </label>
-                        <input 
-                                type="text" 
-                                className="form-control"
-                                value={this.state.expr_responsible}
-                                onChange={this.onChangeExprResponsible}
-                                />
+                        <label>Expiration Date: </label>
+                        <br/>
+                        <DatePicker
+                        selected={this.state.startDate}
+                        onChange={this.handleChange}
+                    />
                     </div>
-                    <div className="form-group">
-                        <div className="form-check form-check-inline">
-                            <input  className="form-check-input" 
-                                    type="radio" 
-                                    name="priorityOptions" 
-                                    id="priorityLow" 
-                                    value="Low"
-                                    checked={this.state.expr_priority==='Low'} 
-                                    onChange={this.onChangeExprPriority}
-                                    />
-                            <label className="form-check-label">Low</label>
-                        </div>
-                        <div className="form-check form-check-inline">
-                            <input  className="form-check-input" 
-                                    type="radio" 
-                                    name="priorityOptions" 
-                                    id="priorityMedium" 
-                                    value="Medium" 
-                                    checked={this.state.expr_priority==='Medium'} 
-                                    onChange={this.onChangeExprPriority}
-                                    />
-                            <label className="form-check-label">Medium</label>
-                        </div>
-                        <div className="form-check form-check-inline">
-                            <input  className="form-check-input" 
-                                    type="radio" 
-                                    name="priorityOptions" 
-                                    id="priorityHigh" 
-                                    value="High" 
-                                    checked={this.state.expr_priority==='High'} 
-                                    onChange={this.onChangeExprPriority}
-                                    />
-                            <label className="form-check-label">High</label>
-                        </div>
-                    </div>
-
+                   
                     <div className="form-group">
                         <input type="submit" value="Create Expr" className="btn btn-primary" />
                     </div>
