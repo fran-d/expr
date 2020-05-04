@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { properties } from './properties.js';
+import DatePicker from "react-datepicker";
+
+import ReactModal from 'react-modal';
 
 
 export default class EditExpr extends Component {
@@ -18,8 +21,13 @@ export default class EditExpr extends Component {
             expr_description: '',
             expr_responsible: '',
             expr_priority: '',
-            expr_completed: false
+            expr_completed: false,
+            startDate: new Date(),
+            showModal: false
         }
+
+        this.handleOpenModal = this.handleOpenModal.bind(this);
+        this.handleCloseModal = this.handleCloseModal.bind(this);
     }
 
     componentDidMount() {
@@ -29,13 +37,31 @@ export default class EditExpr extends Component {
                     expr_description: response.data.expr_description,
                     expr_responsible: response.data.expr_responsible,
                     expr_priority: response.data.expr_priority,
-                    expr_completed: response.data.expr_completed
+                    expr_completed: response.data.expr_completed,
+                    startDate: new Date(response.data.expr_responsible)
                 })   
             })
             .catch(function (error) {
                 console.log(error);
             })
     }
+
+
+    handleOpenModal () {
+        this.setState({ showModal: true });
+      }
+      
+      handleCloseModal () {
+        this.setState({ showModal: false });
+        this.props.history.push('/');
+      }
+    handleChange = date => {
+        console.log(date);
+        this.setState({
+          startDate: date,
+          expr_responsible: date
+        });
+      };
 
     onChangeExprDescription(e) {
         this.setState({
@@ -65,24 +91,24 @@ export default class EditExpr extends Component {
         e.preventDefault();
         const obj = {
             expr_description: this.state.expr_description,
-            expr_responsible: this.state.expr_responsible,
+            expr_responsible: this.state.startDate.toLocaleDateString(),
             expr_priority: this.state.expr_priority,
             expr_completed: this.state.expr_completed
         };
         console.log(obj);
-        axios.post('http://localhost:4000/expr/update/'+this.props.match.params.id, obj)
-            .then(res => console.log(res.data));
+        axios.post('http://'+properties.serverHost+':'+properties.serverPort+'/expr/update/'+this.props.match.params.id, obj)
+            .then(this.handleOpenModal);
         
-        this.props.history.push('/');
+       // this.props.history.push('/');
     }
 
     render() {
         return (
             <div>
-                <h3 align="center">Update Expr</h3>
+                <h3 align="center">Update Item</h3>
                 <form onSubmit={this.onSubmit}>
                     <div className="form-group"> 
-                        <label>Description: </label>
+                        <label>Item Name: </label>
                         <input  type="text"
                                 className="form-control"
                                 value={this.state.expr_description}
@@ -90,69 +116,29 @@ export default class EditExpr extends Component {
                                 />
                     </div>
                     <div className="form-group">
-                        <label>Responsible: </label>
-                        <input 
-                                type="text" 
-                                className="form-control"
-                                value={this.state.expr_responsible}
-                                onChange={this.onChangeExprResponsible}
-                                />
+                        <label>Expiration Date: </label>
+                        <br/>
+                        <DatePicker
+                        selected={this.state.startDate}
+                        onChange={this.handleChange}
+                    />
                     </div>
-                    <div className="form-group">
-                        <div className="form-check form-check-inline">
-                            <input  className="form-check-input" 
-                                    type="radio" 
-                                    name="priorityOptions" 
-                                    id="priorityLow" 
-                                    value="Low"
-                                    checked={this.state.expr_priority==='Low'} 
-                                    onChange={this.onChangeExprPriority}
-                                    />
-                            <label className="form-check-label">Low</label>
-                        </div>
-                        <div className="form-check form-check-inline">
-                            <input  className="form-check-input" 
-                                    type="radio" 
-                                    name="priorityOptions" 
-                                    id="priorityMedium" 
-                                    value="Medium" 
-                                    checked={this.state.expr_priority==='Medium'} 
-                                    onChange={this.onChangeExprPriority}
-                                    />
-                            <label className="form-check-label">Medium</label>
-                        </div>
-                        <div className="form-check form-check-inline">
-                            <input  className="form-check-input" 
-                                    type="radio" 
-                                    name="priorityOptions" 
-                                    id="priorityHigh" 
-                                    value="High" 
-                                    checked={this.state.expr_priority==='High'} 
-                                    onChange={this.onChangeExprPriority}
-                                    />
-                            <label className="form-check-label">High</label>
-                        </div>
-                    </div>
-                    <div className="form-check">
-                        <input  className="form-check-input"
-                                id="completedCheckbox"
-                                type="checkbox"
-                                name="completedCheckbox"
-                                onChange={this.onChangeExprCompleted}
-                                checked={this.state.expr_completed}
-                                value={this.state.expr_completed}
-                                />
-                        <label className="form-check-label" htmlFor="completedCheckbox">
-                            Completed
-                        </label>                        
-                    </div>
+                   
 
                     <br />
 
                     <div className="form-group">
-                        <input type="submit" value="Update Expr" className="btn btn-primary" />
+                        <input type="submit" value="Update Item" className="btn btn-primary" />
                     </div>
                 </form>
+
+                <ReactModal 
+           isOpen={this.state.showModal}
+           contentLabel="Minimal Modal Example"
+        >
+        <h3>Item Updated!</h3>
+          <button onClick={this.handleCloseModal} className="btn btn-primary">OK, SWEET!</button>
+        </ReactModal>
             </div>
         )
     }
