@@ -121,6 +121,7 @@ export default class EditExpr extends Component {
                         <DatePicker
                         selected={this.state.startDate}
                         onChange={this.handleChange}
+                        className="form-control"
                     />
                     </div>
                    
