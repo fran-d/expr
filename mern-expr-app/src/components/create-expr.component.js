@@ -3,6 +3,9 @@ import axios from 'axios';
 import { properties } from './properties.js';
 
 import DatePicker from "react-datepicker";
+
+import ReactModal from 'react-modal';
+
  
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -16,14 +19,25 @@ export default class CreateExpr extends Component {
             expr_responsible: new Date(),
             expr_priority: '',
             expr_completed: false,
-            startDate: new Date()
+            startDate: new Date(),
+            showModal: false
         }
         this.onChangeExprDescription = this.onChangeExprDescription.bind(this);
         this.onChangeExprResponsible = this.onChangeExprResponsible.bind(this);
         this.onChangeExprPriority = this.onChangeExprPriority.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
+
+        this.handleOpenModal = this.handleOpenModal.bind(this);
+        this.handleCloseModal = this.handleCloseModal.bind(this);
     }
 
+        handleOpenModal () {
+        this.setState({ showModal: true });
+      }
+      
+      handleCloseModal () {
+        this.setState({ showModal: false });
+      }
     handleChange = date => {
         console.log(date);
         this.setState({
@@ -66,7 +80,7 @@ export default class CreateExpr extends Component {
         };
 
         axios.post(`http://${properties.serverHost}:${properties.serverPort}/expr/add`, newExpr)
-            .then(res => console.log(res.data));
+            .then(this.handleOpenModal);
 
         this.setState({
             expr_description: '',
@@ -78,7 +92,7 @@ export default class CreateExpr extends Component {
     render() {
         return (
             <div style={{marginTop: 10}}>
-                <h3>Create New Expr</h3>
+                <h3>Add New Item</h3>
                 <form onSubmit={this.onSubmit}>
                     <div className="form-group"> 
                         <label>Item Name: </label>
@@ -94,14 +108,23 @@ export default class CreateExpr extends Component {
                         <DatePicker
                         selected={this.state.startDate}
                         onChange={this.handleChange}
+                        className="form-control"
                     />
                     </div>
                    
                     <div className="form-group">
-                        <input type="submit" value="Create Expr" className="btn btn-primary" />
+                        <input type="submit" value="Create Entry" className="btn btn-primary" />
                     </div>
                 </form>
+                <ReactModal 
+           isOpen={this.state.showModal}
+           contentLabel="Minimal Modal Example"
+        >
+        <h3>Item Added!</h3>
+          <button onClick={this.handleCloseModal} className="btn btn-primary">OK, SWEET!</button>
+        </ReactModal>
             </div>
+            
         )
     }
 }
