@@ -37,6 +37,7 @@ export default class CreateExpr extends Component {
       
       handleCloseModal () {
         this.setState({ showModal: false });
+        this.props.history.push('/');
       }
     handleChange = date => {
         console.log(date);
